@@ -102,9 +102,13 @@ export default function Navbar({
                   PostgreSQL
                 </span>
               ) : (
-                <span className="text-amber-600 font-medium text-[11px]">Standby</span>
+                <span className="text-sky-600 font-bold flex items-center gap-1 text-[11px]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+                  Demo Mode
+                </span>
               )}
             </button>
+
 
             {/* Sync Demo Data */}
             <button
@@ -159,26 +163,30 @@ export default function Navbar({
 
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
               <div className="flex justify-between items-center">
-                <span className="text-slate-600">Status Server:</span>
+                <span className="text-slate-600">Mode Sistem:</span>
                 {health?.postgres_connected ? (
                   <span className="text-emerald-600 font-bold flex items-center gap-1">
-                    <CheckCircle2 className="w-4 h-4" /> Terhubung (Port 5432)
+                    <CheckCircle2 className="w-4 h-4" /> Fullstack (PostgreSQL)
                   </span>
                 ) : (
-                  <span className="text-amber-600 font-semibold flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" /> Standby / Local Mode
+                  <span className="text-sky-600 font-bold flex items-center gap-1">
+                    <CheckCircle2 className="w-4 h-4" /> Web Demo (Browser Storage)
                   </span>
                 )}
               </div>
               <div className="flex justify-between items-center text-[11px] text-slate-600 border-t border-slate-200 pt-2">
-                <span>Nama Database:</span>
-                <span className="font-mono font-bold text-slate-800">it_asset_db</span>
+                <span>Penyimpanan Data:</span>
+                <span className="font-mono font-bold text-slate-800">
+                  {health?.postgres_connected ? 'PostgreSQL (Port 5432)' : 'LocalStorage (Sandbox Mandiri)'}
+                </span>
               </div>
-              <div className="flex justify-between items-center text-[11px] text-slate-600">
-                <span>Fitur Bawaan:</span>
-                <span className="text-slate-800">UUID (pgcrypto) & JSONB Audit</span>
+              <div className="text-[11px] text-slate-500 pt-1 leading-relaxed">
+                {health?.postgres_connected
+                  ? 'Sistem terhubung langsung ke basis data PostgreSQL lokal.'
+                  : 'Mode demo aktif! Anda bebas mencoba menambah, mengedit, menghapus aset, scan QR, dan cetak BAST. Setiap pengunjung memiliki sesi data mandiri tanpa memerlukan server backend.'}
               </div>
             </div>
+
 
             <button
               onClick={() => setShowDbModal(false)}
