@@ -3,11 +3,9 @@
   "version": "1.0.0",
   "description": "IT Asset & Inventory Management System Monorepo",
   "scripts": {
-    "build": "cd frontend && npm install && npm run build",
     "backend": "cd backend && npm start",
     "backend:dev": "cd backend && npm run dev",
     "frontend": "cd frontend && npm run dev",
     "seed": "cd backend && node src/seed.js"
   }
-
 }
