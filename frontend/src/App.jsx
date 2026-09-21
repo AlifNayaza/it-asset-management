@@ -94,7 +94,7 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] antialiased">
+    <div className="h-screen w-full overflow-hidden bg-slate-50 text-slate-900 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] antialiased">
       {/* Top Header Navbar */}
       <Navbar
         onOpenScanner={() => {
@@ -112,7 +112,7 @@ function AppContent() {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Single Unified Sidebar (Desktop Rail & Mobile/Split Drawer) */}
         <Sidebar
           activeTab={activeTab}
@@ -132,8 +132,9 @@ function AppContent() {
         />
 
         {/* Dynamic Page Container */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-8 bg-slate-50/50">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-12 bg-slate-50/50 min-h-0">
           <div className="max-w-7xl mx-auto space-y-6">
+
             {activeTab === 'dashboard' && (
               <Dashboard
                 onOpenScanner={() => {

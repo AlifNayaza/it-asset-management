@@ -366,17 +366,18 @@ export default function AssetTable({
                         )}
                       </td>
 
-                      <td className="py-3 px-3 text-xs font-mono">
-                        <span className="font-bold text-slate-900 block">
+                      <td className="py-3 px-3 text-xs font-mono whitespace-nowrap">
+                        <span className="font-bold text-slate-900 block whitespace-nowrap">
                           Rp {Number(asset.depreciation?.currentBookValue || asset.purchase_price).toLocaleString('id-ID')}
                         </span>
-                        <span className="text-[10px] text-slate-500">
+                        <span className="text-[10px] text-slate-500 block whitespace-nowrap">
                           Beli: Rp {Number(asset.purchase_price).toLocaleString('id-ID')}
                         </span>
                       </td>
 
-                      <td className="py-3 px-3">
-                        <div className="flex items-center justify-center gap-1">
+                      <td className="py-3 px-3 whitespace-nowrap">
+                        <div className="flex items-center justify-center gap-1 shrink-0">
+
                           {asset.status === 'available' && (
                             <button
                               onClick={() => onCheckout && onCheckout(asset)}

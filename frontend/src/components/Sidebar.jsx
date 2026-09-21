@@ -30,7 +30,7 @@ export default function Sidebar({
     { id: 'handover', label: 'Sirkulasi Serah Terima', icon: UserCheck, desc: 'Pinjam & kembalikan' },
     { id: 'maintenance', label: 'Perbaikan & Servis', icon: Wrench, desc: 'Catatan servis unit' },
     { id: 'depreciation', label: 'Laporan Depresiasi', icon: TrendingDown, desc: 'Nilai buku otomatis' },
-    { id: 'audit', label: 'Catatan Audit Data', icon: ShieldAlert, desc: 'Log JSONB PostgreSQL' },
+    { id: 'audit', label: 'Catatan Audit Data', icon: ShieldAlert, desc: 'Log mutasi & audit trail' },
   ];
 
   const handleNavClick = (id) => {
@@ -40,7 +40,7 @@ export default function Sidebar({
 
   const content = (
     <div className="h-full flex flex-col justify-between p-4 overflow-y-auto">
-      <div className="space-y-6">
+      <div className="space-y-5">
         {/* Mobile Header */}
         <div className="flex items-center justify-between md:hidden pb-3 border-b border-slate-200">
           <span className="font-bold text-slate-900 text-sm">Menu Navigasi</span>
@@ -113,9 +113,15 @@ export default function Sidebar({
       </div>
 
       {/* Footer Info */}
-      <div className="pt-4 border-t border-slate-200 text-[11px] text-slate-400">
-        <p className="px-2 text-[11px]">
-          IT Asset & Inventory Management • Laragon Edition
+      <div className="pt-3 border-t border-slate-200">
+        <div className="px-2 flex items-center justify-between">
+          <span className="font-bold text-slate-700 text-xs">IT Asset Manager</span>
+          <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 font-black text-[10px] border border-amber-200 uppercase tracking-wider">
+            Demo Mode
+          </span>
+        </div>
+        <p className="px-2 text-[10px] text-slate-400 mt-1">
+          Penyimpanan Browser (LocalStorage)
         </p>
       </div>
     </div>
@@ -123,12 +129,13 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 bg-white border-r border-slate-200 flex-col shrink-0 min-h-[calc(100vh-53px)] shadow-xs">
+      {/* Desktop Sidebar - Sticky Pinned */}
+      <aside className="hidden md:flex w-64 bg-white border-r border-slate-200 flex-col shrink-0 h-full sticky top-14 self-start shadow-xs z-20 select-none">
         {content}
       </aside>
 
       {/* Mobile Drawer */}
+
       {isMobileOpen && (
         <div className="fixed inset-0 z-40 md:hidden animate-fadeIn">
           <div

@@ -419,6 +419,15 @@ export const mockGetDashboardSummary = async () => {
   return {
     success: true,
     data: {
+      stats: {
+        total_assets: totalAssets,
+        available: availableCount,
+        assigned: assignedCount,
+        maintenance: maintenanceCount,
+        retired: retiredCount,
+        lost: 0,
+        total_acquisition_cost: totalCapex
+      },
       totalAssets,
       availableCount,
       assignedCount,
@@ -432,6 +441,7 @@ export const mockGetDashboardSummary = async () => {
     }
   };
 };
+
 
 export const mockGetAssets = async (params = {}) => {
   const db = getMockDB();
