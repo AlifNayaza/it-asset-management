@@ -13,35 +13,61 @@ import {
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
-import { getHealth, triggerSeed } from '../services/api';
+import { getHealth, triggerSeed, deactivateDemoMode } from '../services/api';
 import { useToast } from './Toast';
 
 export default function Navbar({
+  health: propHealth,
+  onRefreshHealth,
   onOpenScanner,
   onOpenAddAsset,
   onToggleMobileSidebar,
   isMobileSidebarOpen
 }) {
-  const [health, setHealth] = useState(null);
+  const [internalHealth, setInternalHealth] = useState(null);
+  const health = propHealth !== undefined && propHealth !== null ? propHealth : internalHealth;
   const [seeding, setSeeding] = useState(false);
+  const [checkingHealth, setCheckingHealth] = useState(false);
   const [showDbModal, setShowDbModal] = useState(false);
   const [showDemoBanner, setShowDemoBanner] = useState(true);
   const { showSuccess, showError } = useToast();
 
   const checkStatus = async () => {
+    if (onRefreshHealth) {
+      await onRefreshHealth();
+      return;
+    }
     try {
       const data = await getHealth();
-      setHealth(data);
+      setInternalHealth(data);
     } catch (e) {
-      setHealth({ postgres_connected: false, status: 'offline' });
+      setInternalHealth({ postgres_connected: false, status: 'offline' });
+    }
+  };
+
+  const handleReconnect = async () => {
+    setCheckingHealth(true);
+    try {
+      deactivateDemoMode();
+      await checkStatus();
+      showSuccess('Mengecek ulang koneksi backend...');
+      setTimeout(() => {
+        window.location.reload();
+      }, 400);
+    } catch (err) {
+      showError('Gagal menghubungkan: ' + err.message);
+    } finally {
+      setCheckingHealth(false);
     }
   };
 
   useEffect(() => {
-    checkStatus();
-    const interval = setInterval(checkStatus, 15000);
-    return () => clearInterval(interval);
-  }, []);
+    if (propHealth === undefined) {
+      checkStatus();
+      const interval = setInterval(checkStatus, 15000);
+      return () => clearInterval(interval);
+    }
+  }, [propHealth]);
 
   const handleReSeed = async () => {
     if (confirm('Muat ulang seluruh data perangkat IT demo ke kondisi awal (default)?')) {
@@ -225,10 +251,20 @@ export default function Navbar({
               </div>
             </div>
 
+            {!health?.postgres_connected && (
+              <button
+                onClick={handleReconnect}
+                disabled={checkingHealth}
+                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-xs"
+              >
+                <RotateCcw className={`w-3.5 h-3.5 ${checkingHealth ? 'animate-spin' : ''}`} />
+                <span>{checkingHealth ? 'Mengecek Server...' : 'Coba Sambungkan ke Backend PostgreSQL'}</span>
+              </button>
+            )}
 
             <button
               onClick={() => setShowDbModal(false)}
-              className="w-full py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold transition shadow-xs"
+              className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition shadow-xs"
             >
               Tutup
             </button>

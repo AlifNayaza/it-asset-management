@@ -21,15 +21,19 @@ api.interceptors.response.use(
   }
 );
 
-// --- DEMO MODE STATE ---
+// --- DEMO MODE STATE & AUTO-DETECTION ---
+const isLocalhost =
+  typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname === '[::1]');
+
 let demoModeActive =
   import.meta.env.VITE_DEMO_MODE === 'true' ||
   (typeof window !== 'undefined' && (
     window.__DEMO_MODE__ === true ||
-    localStorage.getItem('it_asset_force_demo_mode') === 'true' ||
-    (!import.meta.env.VITE_API_URL &&
-      window.location.hostname !== 'localhost' &&
-      window.location.hostname !== '127.0.0.1')
+    (!isLocalhost && localStorage.getItem('it_asset_force_demo_mode') === 'true') ||
+    (!import.meta.env.VITE_API_URL && !isLocalhost)
   ));
 
 export const isDemoActive = () => demoModeActive;
@@ -38,7 +42,17 @@ export const activateDemoMode = () => {
   demoModeActive = true;
   if (typeof window !== 'undefined') {
     window.__DEMO_MODE__ = true;
-    localStorage.setItem('it_asset_force_demo_mode', 'true');
+    if (!isLocalhost) {
+      localStorage.setItem('it_asset_force_demo_mode', 'true');
+    }
+  }
+};
+
+export const deactivateDemoMode = () => {
+  demoModeActive = false;
+  if (typeof window !== 'undefined') {
+    window.__DEMO_MODE__ = false;
+    localStorage.removeItem('it_asset_force_demo_mode');
   }
 };
 
@@ -48,11 +62,17 @@ export const resetDemoData = () => {
 
 // Seamless runner: calls real backend; if server unreachable or in demo mode, falls back to browser mock
 const executeWithFallback = async (realCall, mockCall) => {
-  if (demoModeActive) {
+  // If explicitly demo mode AND not on localhost, use mock directly
+  if (demoModeActive && !isLocalhost) {
     return await mockCall();
   }
   try {
-    return await realCall();
+    const result = await realCall();
+    // If real call succeeded while on localhost, ensure demo mode is deactivated
+    if (demoModeActive && isLocalhost) {
+      deactivateDemoMode();
+    }
+    return result;
   } catch (err) {
     const isNetworkError =
       !err.response ||
@@ -61,8 +81,10 @@ const executeWithFallback = async (realCall, mockCall) => {
       err.message?.includes('timeout');
 
     if (isNetworkError) {
-      console.warn('Backend server offline. Automatically switched to interactive Demo Mode.', err.message);
-      activateDemoMode();
+      console.warn('Backend server offline or unreachable. Falling back to local data.', err.message);
+      if (!isLocalhost) {
+        activateDemoMode();
+      }
       return await mockCall();
     }
     throw err;
@@ -224,10 +246,24 @@ export const getAuditLogs = async (params = {}) => {
 
 // --- HEALTH & SEED ---
 export const getHealth = async () => {
-  return executeWithFallback(
-    async () => (await api.get('/health')).data,
-    async () => ({ success: true, status: 'ok', mode: 'demo' })
-  );
+  try {
+    const res = await api.get('/health', { timeout: 2000 });
+    if (res.data && res.data.status === 'online') {
+      deactivateDemoMode();
+      return res.data;
+    }
+    return res.data;
+  } catch (err) {
+    if (!isLocalhost) {
+      activateDemoMode();
+    }
+    return {
+      status: 'offline',
+      postgres_connected: false,
+      mode: 'demo',
+      message: 'Backend server tidak merespons di ' + API_BASE_URL
+    };
+  }
 };
 
 export const triggerSeed = async () => {

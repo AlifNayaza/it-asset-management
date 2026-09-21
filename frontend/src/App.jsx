@@ -18,9 +18,28 @@ import MaintenanceLogPage from './views/pages/MaintenanceLogPage';
 import DepreciationReportPage from './views/pages/DepreciationReportPage';
 import AuditLogPage from './views/pages/AuditLogPage';
 
+import { getHealth } from './services/api';
+
 function AppContent() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [health, setHealth] = useState(null);
+
+  // Poll health status regularly
+  const checkHealthStatus = async () => {
+    try {
+      const data = await getHealth();
+      setHealth(data);
+    } catch (e) {
+      setHealth({ postgres_connected: false, status: 'offline' });
+    }
+  };
+
+  useEffect(() => {
+    checkHealthStatus();
+    const interval = setInterval(checkHealthStatus, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Modal States
   const [scannerOpen, setScannerOpen] = useState(false);
@@ -97,6 +116,8 @@ function AppContent() {
     <div className="h-screen w-full overflow-hidden bg-slate-50 text-slate-900 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] antialiased">
       {/* Top Header Navbar */}
       <Navbar
+        health={health}
+        onRefreshHealth={checkHealthStatus}
         onOpenScanner={() => {
           setSelectedAssetId(null);
           setPrintAsset(null);
@@ -115,6 +136,7 @@ function AppContent() {
       <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Single Unified Sidebar (Desktop Rail & Mobile/Split Drawer) */}
         <Sidebar
+          health={health}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           onOpenAddAsset={() => {

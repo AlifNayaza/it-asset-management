@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 
 export default function Sidebar({
+  health,
   activeTab,
   setActiveTab,
   onOpenAddAsset,
@@ -116,12 +117,20 @@ export default function Sidebar({
       <div className="pt-3 border-t border-slate-200">
         <div className="px-2 flex items-center justify-between">
           <span className="font-bold text-slate-700 text-xs">IT Asset Manager</span>
-          <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 font-black text-[10px] border border-amber-200 uppercase tracking-wider">
-            Demo Mode
-          </span>
+          {health?.postgres_connected ? (
+            <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold text-[10px] border border-emerald-200 uppercase tracking-wider">
+              PostgreSQL
+            </span>
+          ) : (
+            <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 font-black text-[10px] border border-amber-200 uppercase tracking-wider">
+              Demo Mode
+            </span>
+          )}
         </div>
         <p className="px-2 text-[10px] text-slate-400 mt-1">
-          Penyimpanan Browser (LocalStorage)
+          {health?.postgres_connected
+            ? 'Terhubung ke Database Port 5432'
+            : 'Penyimpanan Browser (LocalStorage)'}
         </p>
       </div>
     </div>
