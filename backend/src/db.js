@@ -117,7 +117,29 @@ CREATE INDEX IF NOT EXISTS idx_audit_table_record ON audit_logs(table_name, reco
 
 export async function initDatabase() {
   try {
-    const client = await pool.connect();
+    let client;
+    try {
+      client = await pool.connect();
+    } catch (connectErr) {
+      if (connectErr.message && connectErr.message.includes('does not exist')) {
+        console.log('⚡ Database "it_asset_db" belum ada, membuat otomatis di PostgreSQL...');
+        const adminClient = new pg.Client({
+          host: process.env.PGHOST || 'localhost',
+          port: process.env.PGPORT || 5432,
+          user: process.env.PGUSER || 'postgres',
+          password: process.env.PGPASSWORD || '',
+          database: 'postgres'
+        });
+        await adminClient.connect();
+        await adminClient.query('CREATE DATABASE it_asset_db');
+        await adminClient.end();
+        console.log('✅ Database "it_asset_db" berhasil dibuat otomatis!');
+        client = await pool.connect();
+      } else {
+        throw connectErr;
+      }
+    }
+
     console.log('✅ Connected to PostgreSQL database: it_asset_db (Laragon)');
     isPostgresConnected = true;
 
