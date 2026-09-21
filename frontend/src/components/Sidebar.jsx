@@ -129,7 +129,7 @@ export default function Sidebar({
         </div>
         <p className="px-2 text-[10px] text-slate-400 mt-1">
           {health?.postgres_connected
-            ? 'Terhubung ke Database Port 5432'
+            ? 'Terhubung ke Database Server'
             : 'Penyimpanan Browser (LocalStorage)'}
         </p>
       </div>

@@ -81,10 +81,10 @@ export default function AuditLogPage() {
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
             <ShieldAlert className="w-6 h-6 text-indigo-600" />
-            <span>Audit Trail Transaksional PostgreSQL JSONB</span>
+            <span>Audit Trail & Rekam Jejak Sistem</span>
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Rekam jejak perubahan data transaksional memanfaatkan snapshot JSONB dan kunci primer UUID
+            Rekam jejak perubahan data transaksional dan riwayat mutasi aset secara kronologis
           </p>
         </div>
 
